@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdint.h>
 #include <SDL.h>
 
 int main(int argc, char** argv) {
@@ -13,25 +14,25 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 
-	SDL_Surface* surface = SDL_GetWindowSurface(window);
-	SDL_Surface* playerImage = SDL_LoadBMP("Resources/stick_man.bmp");
-	int playerPitch = playerImage->pitch;
+	SDL_Surface* screen = SDL_GetWindowSurface(window);
+	SDL_Surface* pImg = SDL_LoadBMP("Resources/stick_man.bmp");
+	for (int x = 0; x < pImg->w; x++) {
+		for (int y = 0; y < pImg->h; y++) {
+			SDL_LockSurface(pImg);
+			uint32_t pixel = (uint32_t) (uint8_t) pImg->pixels + y * pImg->pitch + x * pImg->format->BytesPerPixel;
+			uint8_t rgb[3];
+			SDL_GetRGB(pixel, pImg->format, &rgb[0], &rgb[1], &rgb[2]);
 
-	for (int i = 0; i < playerImage->w; i++) {
-		int p = i / (playerImage->w/255 + 1);
-		for (int j = 0; j < surface->h; j++) {
-			SDL_Rect* r = &(SDL_Rect) { i, j, 1, 1 };
-			if (((Uint32*)playerImage->pixels)[j*playerPitch*playerImage->w+i] < 255255255)
-				SDL_FillRect(playerImage, r, SDL_MapRGB(surface->format, p, p, p));
+			if (rgb[0] >= 10) {
+				SDL_UnlockSurface(pImg);
+				SDL_FillRect(pImg, &(SDL_Rect) { x, y, 1, 1 }, SDL_MapRGB(pImg->format, 10, 155, 155));
+			}
 		}
 	}
-	SDL_UpdateWindowSurface(window);
 
-	SDL_SaveBMP(playerImage, "saved.bmp");
+	SDL_SaveBMP(pImg, "saved.bmp");
 
 	SDL_DestroyWindow(window);
-	window = NULL;
-	surface = NULL;
 
 	SDL_Quit();
 	return 0;
