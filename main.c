@@ -55,21 +55,20 @@ int main(int argc, char** argv) {
 		printf("Error creatiang window: %s\n", SDL_GetError());
 		return 1;
 	}
-	SDL_Surface* screen = SDL_GetWindowSurface(window);
-	SDL_Surface* pImg = SDL_LoadBMP("Resources/stick_man.bmp");
-	SDL_UpdateWindowSurface(window);
-	for (int x = 0; x < pImg->w; x++) {
-		for (int y = 0; y < pImg->h; y++) {
-			uint8_t rgb[3];
-			SDL_GetRGB(get_pixel32(pImg,x,y), pImg->format, &rgb[0], &rgb[1], &rgb[2]);
-			printf("%d/%dw | %d/%dh\n", x, pImg->w, y, pImg->h);
-			if (rgb[2] >= 100)
-				SDL_FillRect(pImg, &(SDL_Rect) { x, y, 1, 1 }, SDL_MapRGB(pImg->format, 255, 0, 0));
-		}
-	}
-	SDL_SetWindowSize(window, pImg->w, pImg->h);
-	screen = SDL_GetWindowSurface(window);
-	SDL_BlitSurface(pImg, NULL, screen, &(SDL_Rect){ 0,0 });
+
+	SDL_SetWindowSize(window, pImg->w + 70, pImg->h);
+    SDL_Surface* screen = SDL_GetWindowSurface(window);
+    uint32_t penRgb = SDL_MapRGB(pImg->format, 0, 0, 0);
+
+    // Add Buttons
+    SDL_FillRect(screen, &(SDL_Rect){screen->w - 65, 5, 60, 60}, SDL_MapRGB(screen->format, 200, 200, 200));
+    SDL_FillRect(screen, &(SDL_Rect){screen->w - 60, 10, 50, 50}, SDL_MapRGB(screen->format, 255, 0, 0));
+    SDL_FillRect(screen, &(SDL_Rect){screen->w - 65, 75, 60, 60}, SDL_MapRGB(screen->format, 200, 200, 200));
+    SDL_FillRect(screen, &(SDL_Rect){screen->w - 60, 80, 50, 50}, SDL_MapRGB(screen->format, 0, 255, 0));
+    SDL_FillRect(screen, &(SDL_Rect){screen->w - 65, 145, 60, 60}, SDL_MapRGB(screen->format, 200, 200, 200));
+    SDL_FillRect(screen, &(SDL_Rect){screen->w - 60, 150, 50, 50}, SDL_MapRGB(screen->format, 0, 0, 255));
+
+    SDL_BlitSurface(pImg, NULL, SDL_GetWindowSurface(window), NULL);
 	SDL_UpdateWindowSurface(window);
     bool quit = false;
 	while (!quit) {
